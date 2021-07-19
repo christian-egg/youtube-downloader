@@ -11,7 +11,7 @@ ytmp3_url = "https://ytmp3.cc/youtubemp3/"
     #print("Incorrect number of arguments. \nFormat: python yt_web_bot.py [video url] [file format (mp3 or mp4)]")
     #quit()
 
-video_url = 'empty'
+video_url = 'https://www.youtube.com/watch?v=fztKqreP1pk'
 #video_url = sys.argv[1]
 #format = sys.argv[0]
 
@@ -28,11 +28,26 @@ input_field.send_keys(video_url)
 
 driver.find_element_by_id('submit').click()
 
-# Make sure the link worked properly
-try:
-    driver.find_element_by_id('button')
-except NoSuchElementException:
-    print("Video could not be converted. Check that your URL is correct.")
-    quit()
+#Wait for page to load
+time.sleep(5)
 
-breakpoint()
+# Wait until either a download button or an error tag is found
+is_done_loading = False
+download_button = None
+
+while (is_done_loading != True):
+    # Check for download button
+    try:
+        download_button = driver.find_element_by_link_text("Download")
+        is_done_loading = True
+    except NoSuchElementException:
+        try:
+            error_message = driver.find_element_by_tag_name("error")
+            print("Video could not be converted. Check that your URL is correct.")
+            is_done_loading = True
+        except NoSuchElementException:
+            time.sleep(5)
+
+
+if download_button != None:
+    download_button.click()
